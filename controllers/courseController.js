@@ -1,5 +1,4 @@
 const Course = require('../models/courseModel');
-const Tournament = require('../models/tournamentModal'); // Ensure Tournament is imported
 
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -7,93 +6,53 @@ const path = require('path');
 
 // Configure multer to store images in a specific folder
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/images'); // Folder where the images will be stored
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // File name will have a timestamp to avoid conflicts
-  }
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/images'); // Folder where the images will be stored
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname)); // File name will have a timestamp to avoid conflicts
+    }
 });
 
 // Initialize multer with the storage configuration
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit image size to 5MB
-  fileFilter: function (req, file, cb) {
-    const fileTypes = /jpeg|jpg|png/; // Allow only image files
-    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimeType = fileTypes.test(file.mimetype);
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limit image size to 5MB
+    fileFilter: function (req, file, cb) {
+        const fileTypes = /jpeg|jpg|png/; // Allow only image files
+        const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimeType = fileTypes.test(file.mimetype);
 
-    if (extname && mimeType) {
-      return cb(null, true);
-    } else {
-      cb('Error: Only images are allowed!'); // Reject files that aren't images
+        if (extname && mimeType) {
+            return cb(null, true);
+        } else {
+            cb('Error: Only images are allowed!'); // Reject files that aren't images
+        }
     }
-  }
 });
+
 const createCourse = async (req, res) => {
     try {
-        const { tournamentId } = req.body;
-
-        // Ensure the tournament exists
-        const tournament = await Tournament.findById(tournamentId);
-        if (!tournament) {
-            return res.status(404).json({ message: 'Tournament not found' });
-        }
-
-        // Handle file upload if it exists
+        // Check if an image is uploaded and add its path to the course data
         let courseData = { ...req.body };
         if (req.file) {
             courseData.courseImage = `/uploads/images/${req.file.filename}`;
         }
 
-        // Parse obstacles if they are sent as JSON
+        // Parse obstacles if they are sent as JSON (sometimes sent as strings in form data)
         if (req.body.obstacles) {
             courseData.obstacles = JSON.parse(req.body.obstacles);
         }
-
-        // Create the course and associate it with the tournament
-        const course = await Course.create({ ...courseData, tournament: tournament._id });
-
-        // Add the course to the tournament's courses array
-        tournament.courses.push(course._id);
-        await tournament.save();
-
-        res.status(201).json(course);
+        // Create the course with the image path and other data
+        const course = await Course.create(courseData);
+        res.status(201).json(course); // Send back the created course
     } catch (error) {
         res.status(500).json({ message: 'Failed to create course', error: error.message });
     }
 };
-// const createCourse = async (req, res) => {
-//     try {
-//         // Check if an image is uploaded and add its path to the course data
-//         let courseData = { ...req.body };
-//         if (req.file) {
-//             courseData.courseImage = `/uploads/images/${req.file.filename}`;
-//         }
 
-//         // Parse obstacles if they are sent as JSON (sometimes sent as strings in form data)
-//         if (req.body.obstacles) {
-//             courseData.obstacles = JSON.parse(req.body.obstacles);
-//         }
 
-//         // Create the course with the image path and other data
-//         const course = await Course.create(courseData);
-//         res.status(201).json(course); // Send back the created course
-//     } catch (error) {
-//         res.status(500).json({ message: 'Failed to create course', error: error.message });
-//     }
-// };
 
- 
-// const createCourse = async (req, res) => {
-//     try {
-//         const course = await Course.create(req.body);
-//         res.status(201).json(course);
-//     } catch (error) {
-//         res.status(500).json({ message: 'Failed to create course' });
-//     }
-// };
 const getAllCourses = async (req, res) => {
     try {
         const courses = await Course.find();  // Fetch all courses from the database

@@ -16,7 +16,6 @@ const courseSchema = new mongoose.Schema({
     obstacles: [obstacleSchema],
     timeAllowed: String,
     venue: String,
-    tournament: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament', required: true } // Reference to Tournament
-});
+ });
 
 module.exports = mongoose.model('Course', courseSchema);
