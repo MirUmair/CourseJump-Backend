@@ -8,6 +8,7 @@ const courseRoutes = require('./routes/courseRoutes');
 
 dotenv.config();
 connectDB();
+const path = require('path');
 
 const app = express();
 app.use(cors());
