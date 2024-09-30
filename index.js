@@ -14,6 +14,7 @@ app.use(cors());
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use('/images', express.static(path.join(__dirname, 'controllers')));
 
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
