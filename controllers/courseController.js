@@ -36,7 +36,7 @@ const createCourse = async (req, res) => {
         // Check if an image is uploaded and add its path to the course data
         let courseData = { ...req.body };
         if (req.file) {
-            courseData.courseImage = __dirname + `/${req.file.filename}`;
+            courseData.courseImage = `/${req.file.filename}`;
         }
         // Parse obstacles if they are sent as JSON (sometimes sent as strings in form data)
         if (req.body.obstacles) {
