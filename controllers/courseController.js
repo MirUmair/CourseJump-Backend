@@ -7,7 +7,7 @@ const path = require('path');
 // Configure multer to store images in a specific folder
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/images'); // Folder where the images will be stored
+        cb(null, __dirname); // Folder where the images will be stored
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname)); // File name will have a timestamp to avoid conflicts
@@ -36,7 +36,7 @@ const createCourse = async (req, res) => {
         // Check if an image is uploaded and add its path to the course data
         let courseData = { ...req.body };
         if (req.file) {
-            courseData.courseImage = `/uploads/images/${req.file.filename}`;
+            courseData.courseImage = __dirname + `/${req.file.filename}`;
         }
 
         // Parse obstacles if they are sent as JSON (sometimes sent as strings in form data)
