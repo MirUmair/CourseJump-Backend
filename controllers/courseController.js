@@ -38,7 +38,6 @@ const createCourse = async (req, res) => {
         if (req.file) {
             courseData.courseImage = __dirname + `/${req.file.filename}`;
         }
-
         // Parse obstacles if they are sent as JSON (sometimes sent as strings in form data)
         if (req.body.obstacles) {
             courseData.obstacles = JSON.parse(req.body.obstacles);
