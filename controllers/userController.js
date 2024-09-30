@@ -3,17 +3,16 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const registerUser = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { firstname, lastname, email, password } = req.body;
     try {
+        console.log(firstname, lastname, email, password)
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'User already exists' });
-
-        const user = await User.create({ username, email, password });
+        const user = await User.create({ firstname, lastname, email, password });
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
         res.status(201).json({ user, token });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Server error', error });
     }
 };
 const loginUser = async (req, res) => {
@@ -57,9 +56,9 @@ const deleteUser = async (req, res) => {
 };
 
 
-module.exports = { 
-    registerUser, 
-    loginUser, 
-    updateUser, 
-    deleteUser 
+module.exports = {
+    registerUser,
+    loginUser,
+    updateUser,
+    deleteUser
 };
