@@ -1,19 +1,9 @@
 const Course = require('../models/courseModel');
 const jwt = require('jsonwebtoken');
-// const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const path = require('path');
-
-// // Configure AWS SDK with credentials and region
-// AWS.config.update({
-//     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//     region: process.env.AWS_REGION  // e.g., 'us-east-1'
-// });
-
-// Create S3 instance
-// const s3 = new AWS.S3();
+ 
 const { S3Client } = require('@aws-sdk/client-s3');
 
 // Configure AWS SDK with credentials
