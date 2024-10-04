@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
@@ -5,7 +6,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
-
+console.log('S3_BUCKET_NAME:', process.env.S3_BUCKET_NAME);
 dotenv.config();
 connectDB();
 const path = require('path');
