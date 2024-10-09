@@ -62,20 +62,23 @@ const createCourse = async (req, res) => {
         res.status(500).json({ message: 'Failed to create course', error: error.message });
     }
 };
-
-const getAllCourses = async (req, res) => {
-    try {
-        const courses = await Course.find();  // Fetch all courses
-        res.status(200).json(courses);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error', error: error.message });
-    }
-};
-
 const updateCourse = async (req, res) => {
     try {
         const { id } = req.params;  // Get course ID
-        const updatedCourse = await Course.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+        let updatedData = { ...req.body };
+
+        // Check if a new image is uploaded and add its S3 URL to the course data
+        if (req.file) {
+            updatedData.courseImage = req.file.location;  // S3 file URL from multer-s3
+        }
+
+        // Parse obstacles if sent as JSON
+        if (req.body.obstacles) {
+            updatedData.obstacles = JSON.parse(req.body.obstacles);
+        }
+
+        // Find the course by ID and update with the new data
+        const updatedCourse = await Course.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true });
 
         if (!updatedCourse) {
             return res.status(404).json({ message: 'Course not found' });
@@ -86,6 +89,30 @@ const updateCourse = async (req, res) => {
         res.status(500).json({ message: 'Failed to update course', error: error.message });
     }
 };
+// const updateCourse = async (req, res) => {
+//     try {
+//         const { id } = req.params;  // Get course ID
+//         const updatedCourse = await Course.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+
+//         if (!updatedCourse) {
+//             return res.status(404).json({ message: 'Course not found' });
+//         }
+
+//         res.status(200).json(updatedCourse);  // Return the updated course
+//     } catch (error) {
+//         res.status(500).json({ message: 'Failed to update course', error: error.message });
+//     }
+// };
+const getAllCourses = async (req, res) => {
+    try {
+        const courses = await Course.find();  // Fetch all courses
+        res.status(200).json(courses);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};
+
+
 
 const getCoursesByUser = async (req, res) => {
     try {

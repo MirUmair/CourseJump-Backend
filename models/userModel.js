@@ -5,7 +5,9 @@ const userSchema = new mongoose.Schema({
     firstname: { type: String, required: true, unique: false },
     lastname: { type: String, required: true, unique: false },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: false }
+    password: { type: String, required: false },
+    resetKey: String,
+    resetKeyExpiration: Date,
 });
 
 userSchema.pre('save', async function(next) {
