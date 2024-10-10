@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const path = require('path');
- 
+
 const { S3Client } = require('@aws-sdk/client-s3');
 
 // Configure AWS SDK with credentials
@@ -16,7 +16,6 @@ const s3 = new S3Client({
 });
 
 // Update multer-s3 with AWS SDK v3 setup
-
 const upload = multer({
     storage: multerS3({
         s3: s3,
@@ -26,20 +25,44 @@ const upload = multer({
             cb(null, Date.now().toString() + path.extname(file.originalname));  // File name with timestamp
         }
     }),
-    limits: { fileSize: 5 * 1024 * 1024 },  // 5MB limit
+    limits: { fileSize: 50 * 1024 * 1024 },  // 50MB limit (you can adjust this limit for videos)
     fileFilter: (req, file, cb) => {
-        // Updated file types to include more image formats
-        const fileTypes = /jpeg|jpg|png|gif|bmp|tiff|webp/;
+        // Updated file types to include more image and video formats
+        const fileTypes = /jpeg|jpg|png|gif|bmp|tiff|webp|mp4|avi|mkv|mov|wmv|flv/;
         const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
         const mimeType = fileTypes.test(file.mimetype);
 
         if (extname && mimeType) {
             return cb(null, true);
         } else {
-            cb('Error: Only image files are allowed!');
+            cb('Error: Only image and video files are allowed!');
         }
     }
 });
+
+// const upload = multer({
+//     storage: multerS3({
+//         s3: s3,
+//         bucket: process.env.YOUR_BUCKET_NAME,
+//         contentType: multerS3.AUTO_CONTENT_TYPE,
+//         key: (req, file, cb) => {
+//             cb(null, Date.now().toString() + path.extname(file.originalname));  // File name with timestamp
+//         }
+//     }),
+//     limits: { fileSize: 5 * 1024 * 1024 },  // 5MB limit
+//     fileFilter: (req, file, cb) => {
+//         // Updated file types to include more image formats
+//         const fileTypes = /jpeg|jpg|png|gif|bmp|tiff|webp/;
+//         const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+//         const mimeType = fileTypes.test(file.mimetype);
+
+//         if (extname && mimeType) {
+//             return cb(null, true);
+//         } else {
+//             cb('Error: Only image files are allowed!');
+//         }
+//     }
+// });
 
 
 const createCourse = async (req, res) => {
