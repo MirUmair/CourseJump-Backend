@@ -92,29 +92,47 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: 'User not found' });
-
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.status(200).json({ user, token });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+
 const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { username, email } = req.body;
-
+    const { firstname, lastname, email, achievement, about, phone, goal, skill } = req.body;
     try {
-        const updatedUser = await User.findByIdAndUpdate(id, { username, email }, { new: true, runValidators: true });
+        // Create an update object and add the image URL if an image is uploaded
+        const updateFields = { lastname, firstname, email, about, phone, achievement, goal, skill };
+        if (req.file) {
+            updateFields.image = req.file.location;  // S3 file URL from multer-s3
+        }
+        // Update the user with the new fields
+        const updatedUser = await User.findByIdAndUpdate(id, updateFields, { new: true, runValidators: true });
         if (!updatedUser) return res.status(404).json({ message: 'User not found' });
-
         res.status(200).json(updatedUser);
     } catch (error) {
         res.status(500).json({ message: 'Failed to update user', error: error.message });
     }
 };
+
+// const updateUser = async (req, res) => {
+//     const { id } = req.params;
+//     const { username, email } = req.body;
+
+//     try {
+//         const updatedUser = await User.findByIdAndUpdate(id, { username, email }, { new: true, runValidators: true });
+//         if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+
+//         res.status(200).json(updatedUser);
+//     } catch (error) {
+//         res.status(500).json({ message: 'Failed to update user', error: error.message });
+//     }
+// };
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
