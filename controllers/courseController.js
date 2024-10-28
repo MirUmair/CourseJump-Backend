@@ -40,31 +40,6 @@ const upload = multer({
     }
 });
 
-// const upload = multer({
-//     storage: multerS3({
-//         s3: s3,
-//         bucket: process.env.YOUR_BUCKET_NAME,
-//         contentType: multerS3.AUTO_CONTENT_TYPE,
-//         key: (req, file, cb) => {
-//             cb(null, Date.now().toString() + path.extname(file.originalname));  // File name with timestamp
-//         }
-//     }),
-//     limits: { fileSize: 5 * 1024 * 1024 },  // 5MB limit
-//     fileFilter: (req, file, cb) => {
-//         // Updated file types to include more image formats
-//         const fileTypes = /jpeg|jpg|png|gif|bmp|tiff|webp/;
-//         const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-//         const mimeType = fileTypes.test(file.mimetype);
-
-//         if (extname && mimeType) {
-//             return cb(null, true);
-//         } else {
-//             cb('Error: Only image files are allowed!');
-//         }
-//     }
-// });
-
-
 const createCourse = async (req, res) => {
     try {
         // Check if an image is uploaded and add its S3 URL to the course data
